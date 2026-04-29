@@ -209,6 +209,12 @@ def main() -> None:
     parser.add_argument("--label-smoothing", type=float, default=0.0)
     parser.add_argument("--use-class-weights", action="store_true")
     parser.add_argument("--optimizer", choices=["adam", "adamw"], default="adam")
+    parser.add_argument(
+        "--color-mode",
+        choices=["rgb", "grayscale"],
+        default="rgb",
+        help="Use normal RGB images, or convert images to grayscale and repeat the channel to remove color cues.",
+    )
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[1]
@@ -232,6 +238,9 @@ def main() -> None:
         image = tf.cast(image, tf.float32)
         image = tf.image.resize(image, img_size, method=tf.image.ResizeMethod.BICUBIC)
         image = tf.clip_by_value(image, 0.0, 255.0)
+        if args.color_mode == "grayscale":
+            image = tf.image.rgb_to_grayscale(image)
+            image = tf.image.grayscale_to_rgb(image)
         if label is None:
             return image
         label = tf.cast(label, tf.int32)
@@ -349,6 +358,12 @@ def main() -> None:
     val_probs = model.predict(val_ds, verbose=0)
     val_preds = val_probs.argmax(axis=1)
     val_accuracy = float((val_preds == val_targets).mean())
+    val_confusion = tf.math.confusion_matrix(val_targets, val_preds, num_classes=num_classes).numpy()
+    val_tp = np.diag(val_confusion).astype(np.float64)
+    val_precision = val_tp / np.clip(val_confusion.sum(axis=0), 1, None)
+    val_recall = val_tp / np.clip(val_confusion.sum(axis=1), 1, None)
+    val_f1 = 2 * val_precision * val_recall / np.clip(val_precision + val_recall, 1e-12, None)
+    val_macro_f1 = float(val_f1.mean())
 
     flip_val_ds = val_ds.map(
         lambda images, labels: (tf.image.flip_left_right(images), labels),
@@ -358,6 +373,12 @@ def main() -> None:
     val_probs_tta = (val_probs + val_probs_flip) / 2.0
     val_preds_tta = val_probs_tta.argmax(axis=1)
     val_accuracy_tta = float((val_preds_tta == val_targets).mean())
+    val_confusion_tta = tf.math.confusion_matrix(val_targets, val_preds_tta, num_classes=num_classes).numpy()
+    val_tp_tta = np.diag(val_confusion_tta).astype(np.float64)
+    val_precision_tta = val_tp_tta / np.clip(val_confusion_tta.sum(axis=0), 1, None)
+    val_recall_tta = val_tp_tta / np.clip(val_confusion_tta.sum(axis=1), 1, None)
+    val_f1_tta = 2 * val_precision_tta * val_recall_tta / np.clip(val_precision_tta + val_recall_tta, 1e-12, None)
+    val_macro_f1_tta = float(val_f1_tta.mean())
 
     result = {
         "experiment": args.name,
@@ -365,6 +386,7 @@ def main() -> None:
         "img_size": args.img_size,
         "batch_size": args.batch_size,
         "split_mode": args.split_mode,
+        "color_mode": args.color_mode,
         "head_epochs": args.head_epochs,
         "fine_epochs": args.fine_epochs,
         "fine_layers": args.fine_layers,
@@ -380,7 +402,9 @@ def main() -> None:
         "best_head_val_accuracy": float(max(history_head.history["val_accuracy"])),
         "best_fine_val_accuracy": float(max(history_fine.history["val_accuracy"])),
         "val_accuracy": val_accuracy,
+        "val_macro_f1": val_macro_f1,
         "val_accuracy_tta": val_accuracy_tta,
+        "val_macro_f1_tta": val_macro_f1_tta,
     }
     print("RESULT", json.dumps(result, indent=2))
 

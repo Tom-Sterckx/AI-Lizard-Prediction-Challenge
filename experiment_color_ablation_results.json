@@ -1,0 +1,24 @@
+{
+  "note": "Same duplicate-aware group split and same staged EfficientNetB0 settings. Grayscale images are converted with rgb_to_grayscale and repeated back to 3 channels, so the model keeps the same input shape but cannot use true color cues.",
+  "experiments": [
+    {
+      "experiment": "color_ablation_rgb_b0",
+      "color_mode": "rgb",
+      "model_path": "tmp_color_ablation_rgb_b0.keras",
+      "val_accuracy": 0.6491228070175439,
+      "val_macro_f1": 0.6379053369736599,
+      "val_accuracy_tta": 0.6535087719298246,
+      "val_macro_f1_tta": 0.6453153877243968
+    },
+    {
+      "experiment": "color_ablation_grayscale_b0",
+      "color_mode": "grayscale",
+      "model_path": "tmp_color_ablation_grayscale_b0.keras",
+      "val_accuracy": 0.5263157894736842,
+      "val_macro_f1": 0.5262466276833314,
+      "val_accuracy_tta": 0.5175438596491229,
+      "val_macro_f1_tta": 0.515346006968779
+    }
+  ],
+  "conclusion": "RGB performed clearly better than grayscale. Color cues should be kept for this dataset."
+}
