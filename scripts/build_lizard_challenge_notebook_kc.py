@@ -85,6 +85,14 @@ cells = [
         We therefore export `ID,TARGET` with integer class predictions.
         """
     ),
+    md(
+        """
+        ## 0A. Imports and Global Settings
+
+        All important hyperparameters are collected near the top so the notebook is easy to adjust and defend.  
+        We fix the random seed for repeatability, use `260x260` images as a balance between detail and speed, and keep the final training settings visible.
+        """
+    ),
     code(
         """
         from pathlib import Path
@@ -155,6 +163,14 @@ cells = [
                 print("Running on CPU. Training will work, but a GPU or Colab runtime is recommended.")
         except Exception as exc:
             print("Could not configure mixed precision:", exc)
+        """
+    ),
+    md(
+        """
+        ## 0B. Load Metadata and Resolve Image Paths
+
+        The CSV files contain image IDs, while the actual images live in folders.  
+        This section connects both sources, checks missing files, and builds the label-to-species mapping used everywhere else.
         """
     ),
     code(
@@ -251,6 +267,13 @@ cells = [
         - possible text or watermark overlays
         """
     ),
+    md(
+        """
+        ### 1A. Class Balance
+
+        We check class balance early because it influences training choices such as class weights, macro-F1 reporting, and how much we trust raw accuracy.
+        """
+    ),
     code(
         """
         label_counts = train_df["label"].value_counts().sort_index()
@@ -277,6 +300,13 @@ cells = [
         print("sample_submission columns:", pd.read_csv(SAMPLE_SUBMISSION).columns.tolist())
         """
     ),
+    md(
+        """
+        ### 1B. Visual Sample Check
+
+        A quick grid of examples helps verify that the labels and folder names make sense before training a model on them.
+        """
+    ),
     code(
         """
         def show_class_examples(df: pd.DataFrame, n_per_class: int = 4) -> None:
@@ -293,6 +323,14 @@ cells = [
             plt.show()
 
         show_class_examples(train_df, n_per_class=4)
+        """
+    ),
+    md(
+        """
+        ### 1C. Image Quality and Resolution Statistics
+
+        Image sizes, brightness, and blur can affect training.  
+        We inspect them to catch extreme outliers and to justify resizing all images consistently.
         """
     ),
     code(
@@ -345,6 +383,14 @@ cells = [
         plt.show()
         """
     ),
+    md(
+        """
+        ### 1D. Duplicate Detection
+
+        We calculate a simple perceptual hash so near-duplicate images can stay in the same train/validation group.  
+        This reduces validation leakage: the model should not see almost the same image during training and validation.
+        """
+    ),
     code(
         """
         def average_hash(path: Path, hash_size: int = 16) -> str:
@@ -371,6 +417,14 @@ cells = [
                 .reset_index(drop=True)
             )
             display(duplicate_preview.head(20))
+        """
+    ),
+    md(
+        """
+        ### 1E. Text or Watermark Review
+
+        Text overlays can accidentally leak information or distract the model.  
+        We do not blindly remove these images, but we score them so they can be inspected and discussed.
         """
     ),
     code(
@@ -435,7 +489,7 @@ cells = [
     ),
     md(
         """
-        ## 1B. Automatic Dataset Cleaning
+        ## 1F. Automatic Dataset Cleaning
 
         Before splitting the data, we remove only high-confidence problems:
 
@@ -444,6 +498,14 @@ cells = [
         - images with extremely unusual aspect ratios
 
         Blur and possible text overlays are kept as review signals instead of being removed blindly, because those can still be real challenge images.
+        """
+    ),
+    md(
+        """
+        ### 1G. Conservative Cleaning Rules
+
+        The cleaning is deliberately conservative.  
+        We remove only rows that are very likely to be problematic, while keeping review columns for softer quality signals.
         """
     ),
     code(
@@ -529,6 +591,14 @@ cells = [
         - class balance stays similar in train and validation
         - images with the same hash group stay together
         - validation macro-F1 becomes more trustworthy
+        """
+    ),
+    md(
+        """
+        ### 2A. Duplicate-Aware Split Function
+
+        A normal random split can put near-duplicates in both train and validation.  
+        This function splits by `hash_group`, so similar images stay together and the validation score is harder to game.
         """
     ),
     code(
@@ -617,6 +687,14 @@ cells = [
         - `tf.data` takes care of batching and prefetching
         """
     ),
+    md(
+        """
+        ### 3A. Augmentation and Dataset Builders
+
+        Augmentation is applied only to training images.  
+        Validation and test images are resized in the same way but not augmented, so evaluation stays stable and comparable.
+        """
+    ),
     code(
         """
         def make_data_augmentation(strength: float = 1.0) -> keras.Sequential:
@@ -694,6 +772,19 @@ cells = [
         For report transparency, the earlier frozen-backbone + Optuna-style settings are kept in the notebook as commented reference values and in the ablation section below.
         """
     ),
+    md(
+        """
+        ### 4A. Model Architecture Choice
+
+        We use **EfficientNetB0** because it is a strong ImageNet-pretrained backbone that is still light enough to train on Colab or a normal laptop.  
+        The custom head adds batch normalization and dropout to reduce overfitting, which is important because this dataset is small.
+
+        The named layers `gradcam_features` and `embedding_features` are intentional:
+
+        - `gradcam_features` lets us explain predictions with Grad-CAM later.
+        - `embedding_features` lets us compare images in feature space for the kNN/blend inference step.
+        """
+    ),
     code(
         """
         def build_transfer_model(
@@ -738,7 +829,18 @@ cells = [
 
             model = keras.Model(inputs, outputs, name="lizard_classifier")
             return model, backbone
+        """
+    ),
+    md(
+        """
+        ### 4B. Class Weights and Validation Metrics
 
+        Accuracy is useful, but macro-F1 tells us whether the model performs fairly across all species.  
+        We calculate both during training and use class weights so smaller classes are not ignored.
+        """
+    ),
+    code(
+        """
         def make_class_weights(labels: pd.Series) -> dict[int, float]:
             counts = labels.value_counts().to_dict()
             total = len(labels)
@@ -804,7 +906,21 @@ cells = [
                     f"Epoch {epoch + 1}: val_macro_f1={macro_f1:.4f} - "
                     f"val_eval_accuracy={accuracy:.4f}"
                 )
+        """
+    ),
+    md(
+        """
+        ### 4C. Training Callbacks
 
+        The callbacks make training more stable and defendable:
+
+        - `ModelCheckpoint` keeps the best validation model, not just the last epoch.
+        - `EarlyStopping` prevents wasting epochs once validation stops improving.
+        - `ReduceLROnPlateau` lowers the learning rate when the model gets stuck.
+        """
+    ),
+    code(
+        """
         class_weights = get_optional_class_weights(train_split["label"])
         val_targets = val_split["label"].to_numpy()
 
@@ -851,7 +967,20 @@ cells = [
             for layer in backbone_model.layers:
                 if isinstance(layer, layers.BatchNormalization):
                     layer.trainable = False
+        """
+    ),
+    md(
+        """
+        ### 4D. Staged Fine-Tuning
 
+        We train in two phases.  
+        First only the new classification head learns the lizard classes. Then we unfreeze the top EfficientNet layers with a much smaller learning rate, so the model can adapt to lizard-specific details without destroying the useful ImageNet features.
+
+        The earlier frozen-only/Optuna attempt is kept as comments below for the report, because it shows that we tried a simpler approach before moving to staged fine-tuning.
+        """
+    ),
+    code(
+        """
         # Previous frozen-only attempt kept here for the report:
         # FINAL_EPOCHS = 10
         # RUN_OPTUNA = True
@@ -900,6 +1029,14 @@ cells = [
         print("Fine-tune learning rate:", FINE_TUNE_LEARNING_RATE)
         print("Fine-tuned backbone layers:", FINE_TUNE_LAYERS)
         print("Primary selection metric: validation accuracy")
+        """
+    ),
+    md(
+        """
+        ### 4E. Training Curves
+
+        We combine the head-training and fine-tuning histories into one table.  
+        The plots make it easy to see whether the model is learning, overfitting, or improving after the backbone is partly unfrozen.
         """
     ),
     code(
@@ -963,7 +1100,7 @@ cells = [
     ),
     md(
         """
-        ## 5A. Ablation Study
+        ### 5A. Ablation Study
 
         A strong notebook does not only report the best model, but also shows **why** the chosen setup makes sense.
 
@@ -971,6 +1108,7 @@ cells = [
 
         - a conservative frozen-backbone baseline
         - the stronger staged fine-tuning setup
+        - RGB training versus grayscale training
         - the final staged model with embedding-assisted inference
 
         Validation accuracy is the primary comparison metric here. Macro-F1 is still useful as a secondary check because the competition metric may care about class balance.
@@ -1007,9 +1145,29 @@ cells = [
                 "backbone": "Top layers unfrozen",
                 "tta": "No",
                 "image_size": "260x260",
-                "val_accuracy": None,
-                "val_macro_f1": None,
-                "notes": "Head training followed by low-learning-rate fine-tuning.",
+                "val_accuracy": 0.6491,
+                "val_macro_f1": 0.6379,
+                "notes": "RGB model. Head training followed by low-learning-rate fine-tuning.",
+            },
+            {
+                "experiment": "Staged fine-tuning + TTA",
+                "augmentation": "Yes",
+                "backbone": "Top layers unfrozen",
+                "tta": "Horizontal flip",
+                "image_size": "260x260",
+                "val_accuracy": 0.6535,
+                "val_macro_f1": 0.6453,
+                "notes": "Same RGB model, but averaged with horizontal-flip predictions.",
+            },
+            {
+                "experiment": "Grayscale staged fine-tuning",
+                "augmentation": "Yes",
+                "backbone": "Top layers unfrozen",
+                "tta": "No",
+                "image_size": "260x260",
+                "val_accuracy": 0.5263,
+                "val_macro_f1": 0.5262,
+                "notes": "Color removed by converting each image to grayscale and repeating the channel.",
             },
             {
                 "experiment": "Final model + embedding blend",
@@ -1017,14 +1175,53 @@ cells = [
                 "backbone": "Top layers unfrozen",
                 "tta": "Yes / Blend",
                 "image_size": "260x260",
-                "val_accuracy": None,
-                "val_macro_f1": None,
+                "val_accuracy": 0.7193,
+                "val_macro_f1": 0.7175,
                 "notes": "Validation-selected softmax + kNN feature-space blend.",
             },
         ]
 
         ablation_df = pd.DataFrame(ABLATION_RESULTS)
         display(ablation_df)
+        """
+    ),
+    md(
+        """
+        ### 5A.1 Color Information Ablation
+
+        To test whether color really helps, we trained the same staged EfficientNetB0 setup twice:
+
+        - **RGB model:** normal color images
+        - **Grayscale model:** images converted to grayscale, then repeated to 3 channels so the architecture stays identical
+
+        This isolates the effect of color cues while keeping the split, image size, backbone, augmentation and fine-tuning schedule the same.
+        """
+    ),
+    code(
+        """
+        color_ablation_path = ROOT / "experiment_color_ablation_results.json"
+
+        if color_ablation_path.exists():
+            with open(color_ablation_path, "r", encoding="utf-8") as file:
+                color_ablation_results = json.load(file)
+
+            color_ablation_df = pd.DataFrame(color_ablation_results["experiments"])
+            metric_columns = ["val_accuracy", "val_macro_f1", "val_accuracy_tta", "val_macro_f1_tta"]
+            color_ablation_df[metric_columns] = color_ablation_df[metric_columns].round(4)
+            display(color_ablation_df)
+            print("Conclusion:", color_ablation_results["conclusion"])
+        else:
+            print("No color ablation result JSON found yet.")
+            print("Run these from the repository root to reproduce the comparison:")
+            print("python scripts/run_local_experiment.py --name color_ablation_rgb_b0 --color-mode rgb --use-class-weights")
+            print("python scripts/run_local_experiment.py --name color_ablation_grayscale_b0 --color-mode grayscale --use-class-weights")
+        """
+    ),
+    md(
+        """
+        **Color ablation conclusion:** RGB performs clearly better than grayscale on this validation split.  
+        The lizard species are not only separated by shape and texture; color patterns also carry useful signal.  
+        Therefore we keep color images in the final pipeline.
         """
     ),
     code(
@@ -1124,6 +1321,14 @@ cells = [
         - If the embedding-assisted blend improves the final score, it shows the learned feature space contains useful nearest-neighbour structure beyond the raw softmax output.
         """
     ),
+    md(
+        """
+        ### 5B. Inference Helpers
+
+        Validation performance can improve without retraining if inference is smarter.  
+        These helper functions support horizontal-flip TTA and embedding-space kNN, where images are compared using the model's learned feature vectors.
+        """
+    ),
     code(
         """
         def horizontal_flip_dataset(dataset: tf.data.Dataset) -> tf.data.Dataset:
@@ -1166,7 +1371,23 @@ cells = [
                 for neighbour_idx, train_idx in enumerate(top_idx[row_idx]):
                     probabilities[row_idx, int(train_labels[train_idx])] += float(weights[row_idx, neighbour_idx])
             return probabilities / np.maximum(probabilities.sum(axis=1, keepdims=True), 1e-8)
+        """
+    ),
+    md(
+        """
+        ### 5C. Build Validation Predictions and Embeddings
 
+        We calculate three useful validation views:
+
+        - normal softmax probabilities
+        - horizontal-flip TTA probabilities
+        - embeddings for train and validation images
+
+        The embeddings allow the model to use nearest neighbours as extra evidence when the softmax output is uncertain.
+        """
+    ),
+    code(
+        """
         val_probabilities_base = model.predict(val_ds, verbose=0)
         val_probabilities_flip = model.predict(horizontal_flip_dataset(val_ds), verbose=0)
         val_probabilities_tta = (val_probabilities_base + val_probabilities_flip) / 2.0
@@ -1211,7 +1432,24 @@ cells = [
             "flip_only": val_embeddings_flip,
             "flip_avg": l2_normalize((val_embeddings_orig + val_embeddings_flip) / 2.0),
         }
+        """
+    ),
+    md(
+        """
+        ### 5D. Search the Best Inference Strategy
 
+        Instead of guessing one inference method, we compare several candidates on the validation set:
+
+        - plain softmax
+        - flip TTA
+        - kNN in embedding space
+        - weighted blends of TTA and kNN
+
+        This is why the final inference choice is evidence-based instead of arbitrary.
+        """
+    ),
+    code(
+        """
         if INFERENCE_SEARCH_MODE == "auto":
             for embedding_variant, query_embeddings in val_embedding_variants.items():
                 for temperature in [0.03, 0.05, 0.07, 0.10, 0.15, 0.20, 0.30]:
@@ -1247,7 +1485,18 @@ cells = [
                                     "alpha": float(alpha),
                                 },
                             )
+        """
+    ),
+    md(
+        """
+        ### 5E. Select and Report the Best Strategy
 
+        The final validation metrics are calculated from the best strategy found above.  
+        We keep base softmax and TTA scores next to it so the improvement is visible and easy to explain.
+        """
+    ),
+    code(
+        """
         inference_results_df = (
             pd.DataFrame(
                 [
@@ -1310,6 +1559,14 @@ cells = [
         display(evaluation_table)
         """
     ),
+    md(
+        """
+        ### 5F. Confusion Matrix
+
+        A confusion matrix shows which species are mixed up most often.  
+        This is more useful than a single accuracy number because it tells us where the model still needs help.
+        """
+    ),
     code(
         """
         def plot_confusion_matrix(cm: np.ndarray, labels: list[str]) -> None:
@@ -1333,6 +1590,13 @@ cells = [
             plt.show()
 
         plot_confusion_matrix(confusion, class_names)
+        """
+    ),
+    md(
+        """
+        ### 5G. Misclassified Images
+
+        Looking at the wrong predictions helps us understand whether mistakes come from similar species, bad image quality, confusing backgrounds, or low confidence.
         """
     ),
     code(
@@ -1369,6 +1633,14 @@ cells = [
             print("No misclassified validation images in this run.")
         """
     ),
+    md(
+        """
+        ### 5H. Most Common Confusions
+
+        This table turns the mistakes into pairs such as `true species -> predicted species`.  
+        It is useful for the discussion section because it gives concrete examples instead of only global metrics.
+        """
+    ),
     code(
         """
         confusion_pairs = (
@@ -1392,7 +1664,7 @@ cells = [
     ),
     md(
         """
-        ## 5B. Grad-CAM Explainability
+        ### 5I. Grad-CAM Explainability
 
         Grad-CAM helps us inspect **where** the model is looking before making a prediction.
 
@@ -1566,16 +1838,62 @@ cells = [
     ),
     md(
         """
+        ### 6B. Optional High-Score Ensemble Check
+
+        The main notebook trains one clean model pipeline.  
+        Separately, we also tested whether saved models can be combined as an ensemble.
+
+        To reproduce the validation-calibrated high-score from the terminal, run:
+
+        `python scripts/search_existing_model_ensembles.py --include-validation-bias`
+
+        The cell below displays the saved search result if the JSON file already exists.
+        """
+    ),
+    code(
+        """
+        ensemble_result_path = ROOT / "experiment_weighted_ensembles_repro.json"
+
+        if ensemble_result_path.exists():
+            with open(ensemble_result_path, "r", encoding="utf-8") as file:
+                ensemble_results = json.load(file)
+            top_ensemble_results = pd.DataFrame(ensemble_results["top_results"]).head(10)
+            display(top_ensemble_results)
+        else:
+            print("No ensemble result JSON found yet.")
+            print("Run this from the repository root:")
+            print("python scripts/search_existing_model_ensembles.py --include-validation-bias")
+        """
+    ),
+    md(
+        """
         ## 7. Results Discussion
 
-        Reference result from the strongest strict duplicate-aware validation run:
+        Reference result from the strongest strict duplicate-aware single-pipeline validation run:
 
         - **Best validation accuracy:** `0.7193`
-        - **Reference point reached?** Yes, the 70% target was exceeded.
+        - **Best validation macro-F1:** `0.7175`
+        - **Reference point reached?** Yes, the original 70% target was exceeded.
         - **Winning inference setup:** staged fine-tuning + TTA/kNN embedding blend
         - **Best blend settings:** `embedding_variant=flip_only`, `k=31`, `temperature=0.20`, `alpha=0.20`
-        - **Earlier attempt kept for transparency:** frozen-backbone / Optuna-style settings are still shown in comments above
         - **What helped most:** duplicate-aware split, automatic cleaning, staged fine-tuning, embedding-assisted inference blend
+
+        Extra high-score validation experiment:
+
+        - **Best validation accuracy:** `0.7719`
+        - **Best validation macro-F1:** `0.7690`
+        - **Method:** weighted ensemble of saved models + a small validation-calibrated class bias
+        - **Settings:** `tmp_b0_stratified_baseline.keras:flip` weight `0.66`, `tmp_ev2b0_baseline.keras:base` weight `0.34`, temperature `0.8`, class `2` bias `+0.30`
+        - **Important caveat:** the class bias is selected on the validation labels, so this is an optimistic validation high-score rather than the cleanest unbiased estimate.
+        - **Reproducibility:** run `python scripts/search_existing_model_ensembles.py --include-validation-bias`
+
+        Earlier frozen-backbone / Optuna-style settings are still shown in comments above so the report can explain what was tried and why the final approach changed.
+
+        Color ablation result:
+
+        - **RGB staged model + TTA:** `0.6535` validation accuracy, `0.6453` macro-F1
+        - **Grayscale staged model:** `0.5263` validation accuracy, `0.5262` macro-F1
+        - **Conclusion:** color information is useful for this dataset, so the final pipeline keeps RGB images.
 
         In practice, the hardest errors are still expected between visually similar green/brown species and between iguana variants with comparable body shape or misleading background context.
         """

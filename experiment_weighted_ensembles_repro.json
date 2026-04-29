@@ -1,0 +1,906 @@
+{
+  "note": "Validation-calibrated bias uses validation labels to select the final bias. Report it as an optimistic validation high-score, not as an unbiased estimate.",
+  "top_results": [
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.3
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690459032130031
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690459032130031
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.3
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690459032130031
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690459032130031
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.3
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.1
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.66,
+        0.33999999999999997
+      ],
+      "temperature": 2.0,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.1
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.3
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.1
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.67,
+        0.32999999999999996
+      ],
+      "temperature": 2.0,
+      "validation_calibrated_bias": {
+        "class_index": 2,
+        "bias": 0.1
+      },
+      "val_accuracy": 0.7719298245614035,
+      "val_macro_f1": 0.7690241443367732
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:base",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 5,
+        "bias": 0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7666238561861327
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:base",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temperature": 2.0,
+      "validation_calibrated_bias": {
+        "class_index": 5,
+        "bias": 0.05
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7666238561861327
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:base",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 5,
+        "bias": 0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7666238561861327
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:base",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 5,
+        "bias": 0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7666238561861327
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:base",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 5,
+        "bias": 0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7666238561861327
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.3
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.3
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.3
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 2.0,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.64,
+        0.36
+      ],
+      "temperature": 2.0,
+      "validation_calibrated_bias": {
+        "class_index": 6,
+        "bias": -0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7659146628766946
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.56,
+        0.43999999999999995
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.56,
+        0.43999999999999995
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.56,
+        0.43999999999999995
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.56,
+        0.43999999999999995
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.56,
+        0.43999999999999995
+      ],
+      "temperature": 1.2,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.56,
+        0.43999999999999995
+      ],
+      "temperature": 1.5,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.5700000000000001,
+        0.42999999999999994
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.3
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.5700000000000001,
+        0.42999999999999994
+      ],
+      "temperature": 0.6,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.5700000000000001,
+        0.42999999999999994
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.2
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.5700000000000001,
+        0.42999999999999994
+      ],
+      "temperature": 0.8,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.5700000000000001,
+        0.42999999999999994
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.15
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    },
+    {
+      "kind": "weighted_pair_validation_bias",
+      "members": [
+        "tmp_b0_stratified_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.5700000000000001,
+        0.42999999999999994
+      ],
+      "temperature": 1.0,
+      "validation_calibrated_bias": {
+        "class_index": 0,
+        "bias": -0.1
+      },
+      "val_accuracy": 0.7675438596491229,
+      "val_macro_f1": 0.7658205085312815
+    }
+  ],
+  "all_results_count": 77645
+}
