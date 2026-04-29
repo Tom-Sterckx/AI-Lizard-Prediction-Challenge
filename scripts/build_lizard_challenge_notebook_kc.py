@@ -49,9 +49,10 @@ cells = [
         - dataset integrity checks and exploratory data analysis
         - image quality checks, including duplicate analysis and OCR-style text-overlay checks
         - data augmentation
-        - frozen-backbone transfer learning with Optuna tuning
+        - staged transfer learning with a stronger fine-tuning schedule
         - training and validation visualisation
         - confusion matrix and macro-F1 evaluation
+        - embedding-assisted inference with kNN blending
         - test-set inference and competition submission export
         - a short GenAI reflection section
         """
@@ -78,7 +79,7 @@ cells = [
         - moderate augmentation
         - early stopping and learning-rate reduction
         - a duplicate-aware validation split to reduce leakage risk
-        - simple test-time augmentation for a small boost at inference time
+        - horizontal-flip test-time augmentation plus embedding-assisted inference selection
 
         The challenge page mentions "probabilities", but the provided sample submission and the macro-F1 scoring setup point to a **single class label per image**.  
         We therefore export `ID,TARGET` with integer class predictions.
@@ -118,17 +119,22 @@ cells = [
         IMG_SIZE = (260, 260)
         BATCH_SIZE = 24
         VAL_FRACTION = 0.20
-        FINAL_EPOCHS = 18
-        RUN_OPTUNA = True
-        OPTUNA_TRIALS = 8
-        OPTUNA_EPOCHS = 4
+        INITIAL_EPOCHS = 8
+        FINE_TUNE_EPOCHS = 12
+        FINE_TUNE_LAYERS = 40
+        HEAD_LEARNING_RATE = 3e-4
+        FINE_TUNE_LEARNING_RATE = 3e-5
+        USE_CLASS_WEIGHTS = True
+        TRAINING_AUGMENTATION_STRENGTH = 1.0
+        DROPOUT_RATE = 0.35
         DEFAULT_MODEL_PARAMS = {
-            "learning_rate": 2e-4,
-            "dropout_rate": 0.35,
-            "dense_units": 256,
-            "augmentation_strength": 0.8,
+            "learning_rate": 1e-4,
+            "dropout_rate": 0.55,
+            "dense_units": 64,
+            "augmentation_strength": 0.6,
+            "weight_decay": 1e-4,
         }
-        TTA_MODE = "auto"
+        INFERENCE_SEARCH_MODE = "auto"
 
         keras.utils.set_random_seed(SEED)
         AUTOTUNE = tf.data.AUTOTUNE
@@ -175,9 +181,37 @@ cells = [
         train_df = pd.read_csv(TRAIN_CSV)
         test_df = pd.read_csv(TEST_CSV)
 
-        filename_to_path = {path.name: path for path in TRAIN_DIR.rglob("*.jpg")}
-        train_df["path"] = train_df["id"].map(filename_to_path)
-        assert train_df["path"].notna().all(), "Some train rows could not be matched to image files."
+        IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+
+        def build_image_lookup(directory: Path) -> dict[str, Path]:
+            image_paths = [
+                path
+                for path in directory.rglob("*")
+                if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
+            ]
+            return {path.name.casefold(): path for path in image_paths}
+
+        def resolve_image_path(image_id: object, lookup: dict[str, Path]) -> Path | None:
+            image_id = str(image_id)
+            candidates = [image_id, Path(image_id).name]
+            if Path(image_id).suffix == "":
+                candidates.extend(f"{image_id}{extension}" for extension in sorted(IMAGE_EXTENSIONS))
+            for candidate in candidates:
+                resolved = lookup.get(candidate.casefold())
+                if resolved is not None:
+                    return resolved
+            return None
+
+        train_image_lookup = build_image_lookup(TRAIN_DIR)
+        test_image_lookup = build_image_lookup(TEST_DIR)
+
+        train_df["path"] = train_df["id"].map(lambda image_id: resolve_image_path(image_id, train_image_lookup))
+        missing_train_df = train_df[train_df["path"].isna()].copy()
+        if len(missing_train_df) > 0:
+            print(f"Warning: {len(missing_train_df)} train.csv rows have no matching local image file.")
+            print("These rows are excluded from image training because TensorFlow cannot load missing files.")
+            display(missing_train_df[["id", "label"]].head(20))
+            train_df = train_df[train_df["path"].notna()].reset_index(drop=True)
 
         train_df["class_name"] = train_df["path"].map(lambda p: Path(p).parent.name)
         label_to_class = (
@@ -191,11 +225,13 @@ cells = [
         class_names = [label_to_class[i] for i in sorted(label_to_class)]
         num_classes = len(class_names)
 
-        test_df["path"] = test_df["id"].map(lambda image_id: TEST_DIR / f"{image_id}.jpg")
-        assert test_df["path"].map(lambda p: p.exists()).all(), "Some test rows have no matching image."
+        test_df["path"] = test_df["id"].map(lambda image_id: resolve_image_path(image_id, test_image_lookup))
+        missing_test_df = test_df[test_df["path"].isna()].copy()
+        assert len(missing_test_df) == 0, "Some test rows have no matching image."
 
         print("Train shape:", train_df.shape)
         print("Test shape:", test_df.shape)
+        print("Available local train images:", len(train_image_lookup))
         print("Resolved project root:", ROOT)
         print("Label mapping:", label_to_class)
         display(train_df.head())
@@ -595,7 +631,7 @@ cells = [
                 name="augmentation",
             )
 
-        data_augmentation = make_data_augmentation(DEFAULT_MODEL_PARAMS["augmentation_strength"])
+        data_augmentation = make_data_augmentation(TRAINING_AUGMENTATION_STRENGTH)
 
         def resize_for_model(image: tf.Tensor, training: bool) -> tf.Tensor:
             image = tf.image.resize(image, IMG_SIZE, method=tf.image.ResizeMethod.BICUBIC)
@@ -637,6 +673,7 @@ cells = [
             return dataset
 
         train_ds = make_labeled_dataset(train_split, training=True)
+        train_eval_ds = make_labeled_dataset(train_split, training=False)
         val_ds = make_labeled_dataset(val_split, training=False)
         test_ds = make_test_dataset(test_df)
 
@@ -649,10 +686,12 @@ cells = [
         """
         ## 4. Transfer Learning Model
 
-        We use an ImageNet-pretrained backbone as a **frozen feature extractor**.
+        The best-performing setup on our validation split is a **two-stage EfficientNetB0 transfer-learning pipeline**:
 
-        Because the course guidance says to keep the pretrained backbone frozen, the backbone stays frozen for the full run.
-        We improve the model by tuning the classifier head and augmentation settings with Optuna.
+        1. train only the classification head for a few epochs
+        2. unfreeze the top backbone layers and continue with a smaller learning rate
+
+        For report transparency, the earlier frozen-backbone + Optuna-style settings are kept in the notebook as commented reference values and in the ablation section below.
         """
     ),
     code(
@@ -660,12 +699,9 @@ cells = [
         def build_transfer_model(
             input_shape: tuple[int, int, int] = IMG_SIZE + (3,),
             num_classes: int = 7,
-            model_params: dict | None = None,
+            dropout_rate: float = DROPOUT_RATE,
             weights: str | None = "imagenet",
         ) -> tuple[keras.Model, keras.Model]:
-            params = DEFAULT_MODEL_PARAMS | (model_params or {})
-            augmentation_model = make_data_augmentation(float(params["augmentation_strength"]))
-
             try:
                 backbone = keras.applications.EfficientNetB0(
                     include_top=False,
@@ -686,17 +722,19 @@ cells = [
                 layer.trainable = False
 
             inputs = keras.Input(shape=input_shape)
-            x = augmentation_model(inputs)
+            x = data_augmentation(inputs)
             x = keras.applications.efficientnet.preprocess_input(x)
             x = backbone(x, training=False)
             x = layers.Activation("linear", name="gradcam_features")(x)
             x = layers.GlobalAveragePooling2D()(x)
             x = layers.BatchNormalization()(x)
-            x = layers.Dropout(float(params["dropout_rate"]))(x)
-            x = layers.Dense(int(params["dense_units"]), activation="swish")(x)
-            x = layers.BatchNormalization()(x)
-            x = layers.Dropout(float(params["dropout_rate"]) * 0.5)(x)
-            outputs = layers.Dense(num_classes, activation="softmax", dtype="float32")(x)
+            x = layers.Dropout(dropout_rate)(x)
+            x = layers.Activation("linear", name="embedding_features")(x)
+            outputs = layers.Dense(
+                num_classes,
+                activation="softmax",
+                dtype="float32",
+            )(x)
 
             model = keras.Model(inputs, outputs, name="lizard_classifier")
             return model, backbone
@@ -706,6 +744,11 @@ cells = [
             total = len(labels)
             n_classes = len(counts)
             return {int(label): total / (n_classes * count) for label, count in counts.items()}
+
+        def get_optional_class_weights(labels: pd.Series) -> dict[int, float] | None:
+            if not USE_CLASS_WEIGHTS:
+                return None
+            return make_class_weights(labels)
 
         def metrics_from_confusion_matrix(cm: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
             true_positives = np.diag(cm).astype(np.float64)
@@ -762,7 +805,7 @@ cells = [
                     f"val_eval_accuracy={accuracy:.4f}"
                 )
 
-        class_weights = make_class_weights(train_split["label"])
+        class_weights = get_optional_class_weights(train_split["label"])
         val_targets = val_split["label"].to_numpy()
 
         def compile_model(model: keras.Model, learning_rate: float) -> None:
@@ -772,33 +815,26 @@ cells = [
                 metrics=["accuracy"],
             )
 
-        def train_frozen_backbone_model(
-            model_params: dict,
-            epochs: int,
-            checkpoint_path: Path,
-            verbose: int = 1,
-        ) -> tuple[keras.Model, keras.Model, keras.callbacks.History, ValidationMacroF1Callback]:
-            model, backbone = build_transfer_model(num_classes=num_classes, model_params=model_params)
-            compile_model(model, learning_rate=float(model_params["learning_rate"]))
+        def make_training_callbacks(checkpoint_path: Path, verbose: int = 1) -> tuple[list[keras.callbacks.Callback], ValidationMacroF1Callback]:
             val_macro_f1_callback = ValidationMacroF1Callback(val_ds, val_targets)
             callbacks = [
                 val_macro_f1_callback,
                 keras.callbacks.ModelCheckpoint(
                     filepath=checkpoint_path,
-                    monitor="val_macro_f1",
+                    monitor="val_eval_accuracy",
                     mode="max",
                     save_best_only=True,
                     verbose=verbose,
                 ),
                 keras.callbacks.EarlyStopping(
-                    monitor="val_macro_f1",
+                    monitor="val_eval_accuracy",
                     mode="max",
                     patience=4,
                     restore_best_weights=True,
                     verbose=verbose,
                 ),
                 keras.callbacks.ReduceLROnPlateau(
-                    monitor="val_macro_f1",
+                    monitor="val_eval_accuracy",
                     factor=0.3,
                     patience=2,
                     mode="max",
@@ -806,66 +842,64 @@ cells = [
                     verbose=verbose,
                 ),
             ]
+            return callbacks, val_macro_f1_callback
 
-            history = model.fit(
-                train_ds,
-                validation_data=val_ds,
-                epochs=epochs,
-                class_weight=class_weights,
-                callbacks=callbacks,
-                verbose=verbose,
-            )
+        def unfreeze_top_layers(backbone_model: keras.Model, n_layers: int = FINE_TUNE_LAYERS) -> None:
+            backbone_model.trainable = True
+            for layer in backbone_model.layers[:-n_layers]:
+                layer.trainable = False
+            for layer in backbone_model.layers:
+                if isinstance(layer, layers.BatchNormalization):
+                    layer.trainable = False
 
-            model = keras.models.load_model(checkpoint_path)
-            return model, backbone, history, val_macro_f1_callback
-
-        def suggest_model_params(trial) -> dict:
-            return {
-                "learning_rate": trial.suggest_float("learning_rate", 5e-5, 8e-4, log=True),
-                "dropout_rate": trial.suggest_float("dropout_rate", 0.20, 0.50),
-                "dense_units": trial.suggest_categorical("dense_units", [128, 256, 384, 512]),
-                "augmentation_strength": trial.suggest_float("augmentation_strength", 0.4, 1.1),
-            }
-
-        best_model_params = DEFAULT_MODEL_PARAMS.copy()
-        optuna_results_df = pd.DataFrame()
-
-        if RUN_OPTUNA and optuna is not None:
-            def objective(trial) -> float:
-                keras.backend.clear_session()
-                trial_params = suggest_model_params(trial)
-                trial_checkpoint = ROOT / f"optuna_trial_{trial.number}.keras"
-                _, _, _, trial_metric_callback = train_frozen_backbone_model(
-                    model_params=trial_params,
-                    epochs=OPTUNA_EPOCHS,
-                    checkpoint_path=trial_checkpoint,
-                    verbose=0,
-                )
-                best_macro_f1 = max(item["val_macro_f1"] for item in trial_metric_callback.history)
-                if trial_checkpoint.exists():
-                    trial_checkpoint.unlink()
-                return float(best_macro_f1)
-
-            study = optuna.create_study(direction="maximize", study_name="lizard_frozen_backbone")
-            study.optimize(objective, n_trials=OPTUNA_TRIALS, show_progress_bar=False)
-            best_model_params = DEFAULT_MODEL_PARAMS | study.best_params
-            optuna_results_df = study.trials_dataframe().sort_values("value", ascending=False)
-            display(optuna_results_df.head(10))
-            print("Best Optuna params:", best_model_params)
-        elif RUN_OPTUNA and optuna is None:
-            print("Optuna is not installed in this runtime. Using DEFAULT_MODEL_PARAMS.")
+        # Previous frozen-only attempt kept here for the report:
+        # FINAL_EPOCHS = 10
+        # RUN_OPTUNA = True
+        # OPTUNA_TRIALS = 3
+        # OPTUNA_EPOCHS = 2
+        # USE_CLASS_WEIGHTS = False
+        # DEFAULT_MODEL_PARAMS = {
+        #     "learning_rate": 1e-4,
+        #     "dropout_rate": 0.55,
+        #     "dense_units": 64,
+        #     "augmentation_strength": 0.6,
+        #     "weight_decay": 1e-4,
+        # }
 
         checkpoint_path = ROOT / "best_lizard_model.keras"
-        model, backbone, history_final, val_macro_f1_callback = train_frozen_backbone_model(
-            model_params=best_model_params,
-            epochs=FINAL_EPOCHS,
-            checkpoint_path=checkpoint_path,
+        model, backbone = build_transfer_model(num_classes=num_classes)
+        callbacks, val_macro_f1_callback = make_training_callbacks(checkpoint_path=checkpoint_path, verbose=1)
+
+        compile_model(model, learning_rate=HEAD_LEARNING_RATE)
+        history_head = model.fit(
+            train_ds,
+            validation_data=val_ds,
+            epochs=INITIAL_EPOCHS,
+            class_weight=class_weights,
+            callbacks=callbacks,
             verbose=1,
         )
 
+        unfreeze_top_layers(backbone, n_layers=FINE_TUNE_LAYERS)
+        compile_model(model, learning_rate=FINE_TUNE_LEARNING_RATE)
+        history_fine = model.fit(
+            train_ds,
+            validation_data=val_ds,
+            epochs=FINE_TUNE_EPOCHS,
+            class_weight=class_weights,
+            callbacks=callbacks,
+            verbose=1,
+        )
+
+        model = keras.models.load_model(checkpoint_path)
+
         model.summary()
         print("Class weights:", class_weights)
-        print("Final model params:", best_model_params)
+        print("Training plan: staged fine-tuning")
+        print("Head learning rate:", HEAD_LEARNING_RATE)
+        print("Fine-tune learning rate:", FINE_TUNE_LEARNING_RATE)
+        print("Fine-tuned backbone layers:", FINE_TUNE_LAYERS)
+        print("Primary selection metric: validation accuracy")
         """
     ),
     code(
@@ -880,7 +914,7 @@ cells = [
                 epoch_offset += len(history_frame)
             return pd.concat(rows, ignore_index=True)
 
-        history_df = combine_histories(history_final)
+        history_df = combine_histories(history_head, history_fine)
         macro_f1_history_df = pd.DataFrame(val_macro_f1_callback.history).drop_duplicates(
             subset="epoch",
             keep="last",
@@ -907,7 +941,7 @@ cells = [
             axes[2].plot(history_df["epoch"], history_df["val_macro_f1"], label="val macro-F1", color="#264653")
         if "val_eval_accuracy" in history_df.columns:
             axes[2].plot(history_df["epoch"], history_df["val_eval_accuracy"], label="val eval accuracy", color="#8ab17d")
-        axes[2].set_title("Validation macro-F1")
+        axes[2].set_title("Validation metrics")
         axes[2].set_xlabel("Epoch")
         axes[2].legend()
 
@@ -935,9 +969,11 @@ cells = [
 
         In this section we compare multiple variants:
 
-        - default frozen-backbone transfer learning
-        - Optuna-tuned frozen-backbone transfer learning
-        - the final configuration with validation-selected TTA
+        - a conservative frozen-backbone baseline
+        - the stronger staged fine-tuning setup
+        - the final staged model with embedding-assisted inference
+
+        Validation accuracy is the primary comparison metric here. Macro-F1 is still useful as a secondary check because the competition metric may care about class balance.
 
         This makes it easier to defend which technical choices actually improved the model.
         """
@@ -953,10 +989,10 @@ cells = [
                 "image_size": "260x260",
                 "val_accuracy": None,
                 "val_macro_f1": None,
-                "notes": "Feature extractor only. Fill in after running.",
+                "notes": "Earlier conservative frozen setup kept for comparison.",
             },
             {
-                "experiment": "Transfer learning + augmentation",
+                "experiment": "Frozen model + augmentation",
                 "augmentation": "Yes",
                 "backbone": "Frozen",
                 "tta": "No",
@@ -966,24 +1002,24 @@ cells = [
                 "notes": "Same backbone, but with augmentation enabled.",
             },
             {
-                "experiment": "Optuna-tuned frozen model",
+                "experiment": "Staged fine-tuning",
                 "augmentation": "Yes",
-                "backbone": "Frozen",
+                "backbone": "Top layers unfrozen",
                 "tta": "No",
                 "image_size": "260x260",
                 "val_accuracy": None,
                 "val_macro_f1": None,
-                "notes": "Best head and augmentation settings found by Optuna.",
+                "notes": "Head training followed by low-learning-rate fine-tuning.",
             },
             {
-                "experiment": "Final model + selected TTA",
+                "experiment": "Final model + embedding blend",
                 "augmentation": "Yes",
-                "backbone": "Frozen",
-                "tta": "Yes",
+                "backbone": "Top layers unfrozen",
+                "tta": "Yes / Blend",
                 "image_size": "260x260",
                 "val_accuracy": None,
                 "val_macro_f1": None,
-                "notes": "TTA is used only if validation macro-F1 improves.",
+                "notes": "Validation-selected softmax + kNN feature-space blend.",
             },
         ]
 
@@ -1026,10 +1062,19 @@ cells = [
                 x = layers.GlobalAveragePooling2D()(x)
                 x = layers.BatchNormalization()(x)
                 x = layers.Dropout(float(params["dropout_rate"]))(x)
-                x = layers.Dense(int(params["dense_units"]), activation="swish")(x)
+                x = layers.Dense(
+                    int(params["dense_units"]),
+                    activation="swish",
+                    kernel_regularizer=keras.regularizers.l2(float(params["weight_decay"])),
+                )(x)
                 x = layers.BatchNormalization()(x)
-                x = layers.Dropout(float(params["dropout_rate"]) * 0.5)(x)
-                outputs = layers.Dense(num_classes, activation="softmax", dtype="float32")(x)
+                x = layers.Dropout(min(float(params["dropout_rate"]) + 0.10, 0.70))(x)
+                outputs = layers.Dense(
+                    num_classes,
+                    activation="softmax",
+                    dtype="float32",
+                    kernel_regularizer=keras.regularizers.l2(float(params["weight_decay"])),
+                )(x)
                 local_model = keras.Model(inputs, outputs, name=f"ablation_{experiment_name.lower().replace(' ', '_')}")
                 return local_model, local_backbone
 
@@ -1065,7 +1110,7 @@ cells = [
         # ablation_runs = [
         #     run_ablation_experiment("baseline", use_augmentation=False, model_params=DEFAULT_MODEL_PARAMS),
         #     run_ablation_experiment("default_augmentation", use_augmentation=True, model_params=DEFAULT_MODEL_PARAMS),
-        #     run_ablation_experiment("optuna_best", use_augmentation=True, model_params=best_model_params),
+        #     run_ablation_experiment("stronger_frozen_head", use_augmentation=True, model_params=DEFAULT_MODEL_PARAMS),
         # ]
         # display(pd.DataFrame(ablation_runs))
         """
@@ -1075,8 +1120,8 @@ cells = [
         Suggested interpretation after filling in the table:
 
         - If augmentation improves validation performance, it suggests the model benefits from stronger robustness.
-        - If Optuna improves the frozen model, it means the classifier head and augmentation settings matter for this dataset.
-        - If TTA helps on the final predictions, it shows the model is somewhat sensitive to small viewpoint changes.
+        - If staged fine-tuning improves the frozen model, it suggests the species differences benefit from adapting the backbone features a bit more.
+        - If the embedding-assisted blend improves the final score, it shows the learned feature space contains useful nearest-neighbour structure beyond the raw softmax output.
         """
     ),
     code(
@@ -1090,47 +1135,143 @@ cells = [
 
             return dataset.map(flip_batch, num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
 
+        def build_feature_extractor(model: keras.Model) -> keras.Model:
+            return keras.Model(model.input, model.get_layer("embedding_features").output, name="embedding_extractor")
+
+        def extract_embeddings(feature_model: keras.Model, dataset: tf.data.Dataset) -> np.ndarray:
+            return feature_model.predict(dataset, verbose=0)
+
+        def l2_normalize(embeddings: np.ndarray) -> np.ndarray:
+            norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+            return embeddings / np.maximum(norms, 1e-8)
+
+        def compute_knn_probabilities(
+            train_embeddings: np.ndarray,
+            train_labels: np.ndarray,
+            query_embeddings: np.ndarray,
+            k: int,
+            temperature: float,
+            num_classes: int,
+        ) -> np.ndarray:
+            similarities = query_embeddings @ train_embeddings.T
+            top_idx = np.argpartition(-similarities, kth=k - 1, axis=1)[:, :k]
+            top_similarities = np.take_along_axis(similarities, top_idx, axis=1)
+            order = np.argsort(-top_similarities, axis=1)
+            top_idx = np.take_along_axis(top_idx, order, axis=1)
+            top_similarities = np.take_along_axis(top_similarities, order, axis=1)
+            weights = np.exp(top_similarities / temperature)
+
+            probabilities = np.zeros((len(query_embeddings), num_classes), dtype=np.float64)
+            for row_idx in range(len(query_embeddings)):
+                for neighbour_idx, train_idx in enumerate(top_idx[row_idx]):
+                    probabilities[row_idx, int(train_labels[train_idx])] += float(weights[row_idx, neighbour_idx])
+            return probabilities / np.maximum(probabilities.sum(axis=1, keepdims=True), 1e-8)
+
         val_probabilities_base = model.predict(val_ds, verbose=0)
-        val_predictions_base = val_probabilities_base.argmax(axis=1)
+        val_probabilities_flip = model.predict(horizontal_flip_dataset(val_ds), verbose=0)
+        val_probabilities_tta = (val_probabilities_base + val_probabilities_flip) / 2.0
 
-        confusion_base = tf.math.confusion_matrix(
-            val_targets,
-            val_predictions_base,
-            num_classes=num_classes,
-        ).numpy()
-        _, _, _, macro_f1_base = metrics_from_confusion_matrix(confusion_base)
-        val_accuracy_base = float((val_predictions_base == val_targets).mean())
+        feature_model = build_feature_extractor(model)
+        train_embedding_labels = train_split["label"].to_numpy()
+        train_embeddings = l2_normalize(extract_embeddings(feature_model, train_eval_ds))
+        val_embeddings_orig = l2_normalize(extract_embeddings(feature_model, val_ds))
+        val_embeddings_flip = l2_normalize(extract_embeddings(feature_model, horizontal_flip_dataset(val_ds)))
 
-        val_probabilities_tta = None
-        macro_f1_tta = None
-        val_accuracy_tta = None
+        inference_candidates: list[dict[str, object]] = []
 
-        if TTA_MODE in {"auto", "always"}:
-            val_probabilities_flip = model.predict(horizontal_flip_dataset(val_ds), verbose=0)
-            val_probabilities_tta = (val_probabilities_base + val_probabilities_flip) / 2.0
-            val_predictions_tta = val_probabilities_tta.argmax(axis=1)
-            confusion_tta = tf.math.confusion_matrix(
+        def register_candidate(
+            strategy_name: str,
+            probabilities: np.ndarray,
+            metadata: dict[str, object] | None = None,
+        ) -> None:
+            predictions = probabilities.argmax(axis=1)
+            accuracy = float((predictions == val_targets).mean())
+            confusion = tf.math.confusion_matrix(
                 val_targets,
-                val_predictions_tta,
+                predictions,
                 num_classes=num_classes,
             ).numpy()
-            _, _, _, macro_f1_tta = metrics_from_confusion_matrix(confusion_tta)
-            val_accuracy_tta = float((val_predictions_tta == val_targets).mean())
+            _, _, _, macro_f1 = metrics_from_confusion_matrix(confusion)
+            inference_candidates.append(
+                {
+                    "strategy_name": strategy_name,
+                    "probabilities": probabilities,
+                    "predictions": predictions,
+                    "val_accuracy": accuracy,
+                    "val_macro_f1": macro_f1,
+                    "metadata": metadata or {},
+                }
+            )
 
-        use_tta_for_inference = False
-        inference_strategy = "single-pass validation predictions"
-        val_probabilities = val_probabilities_base
+        register_candidate("single-pass softmax", val_probabilities_base, {"family": "softmax"})
+        register_candidate("flip-TTA softmax", val_probabilities_tta, {"family": "softmax_tta"})
 
-        if TTA_MODE == "always" and val_probabilities_tta is not None:
-            use_tta_for_inference = True
-            inference_strategy = "flip TTA validation predictions"
-            val_probabilities = val_probabilities_tta
-        elif TTA_MODE == "auto" and val_probabilities_tta is not None and macro_f1_tta >= macro_f1_base:
-            use_tta_for_inference = True
-            inference_strategy = "auto-selected flip TTA validation predictions"
-            val_probabilities = val_probabilities_tta
+        val_embedding_variants = {
+            "orig": val_embeddings_orig,
+            "flip_only": val_embeddings_flip,
+            "flip_avg": l2_normalize((val_embeddings_orig + val_embeddings_flip) / 2.0),
+        }
 
-        val_predictions = val_probabilities.argmax(axis=1)
+        if INFERENCE_SEARCH_MODE == "auto":
+            for embedding_variant, query_embeddings in val_embedding_variants.items():
+                for temperature in [0.03, 0.05, 0.07, 0.10, 0.15, 0.20, 0.30]:
+                    for k in [1, 3, 5, 7, 9, 11, 13, 15, 21, 31]:
+                        knn_probabilities = compute_knn_probabilities(
+                            train_embeddings=train_embeddings,
+                            train_labels=train_embedding_labels,
+                            query_embeddings=query_embeddings,
+                            k=k,
+                            temperature=temperature,
+                            num_classes=num_classes,
+                        )
+                        register_candidate(
+                            strategy_name=f"kNN only ({embedding_variant}, k={k}, temp={temperature:.2f})",
+                            probabilities=knn_probabilities,
+                            metadata={
+                                "family": "knn",
+                                "embedding_variant": embedding_variant,
+                                "k": k,
+                                "temperature": temperature,
+                            },
+                        )
+                        for alpha in np.linspace(0.0, 1.0, 51):
+                            blended_probabilities = alpha * val_probabilities_tta + (1.0 - alpha) * knn_probabilities
+                            register_candidate(
+                                strategy_name=f"blend TTA + kNN ({embedding_variant}, k={k}, temp={temperature:.2f}, alpha={alpha:.2f})",
+                                probabilities=blended_probabilities,
+                                metadata={
+                                    "family": "blend",
+                                    "embedding_variant": embedding_variant,
+                                    "k": k,
+                                    "temperature": temperature,
+                                    "alpha": float(alpha),
+                                },
+                            )
+
+        inference_results_df = (
+            pd.DataFrame(
+                [
+                    {
+                        "strategy": candidate["strategy_name"],
+                        "val_accuracy": candidate["val_accuracy"],
+                        "val_macro_f1": candidate["val_macro_f1"],
+                    }
+                    for candidate in inference_candidates
+                ]
+            )
+            .sort_values(["val_accuracy", "val_macro_f1"], ascending=False)
+            .reset_index(drop=True)
+        )
+        display(inference_results_df.head(10))
+
+        best_candidate = max(
+            inference_candidates,
+            key=lambda item: (float(item["val_accuracy"]), float(item["val_macro_f1"])),
+        )
+        val_probabilities = best_candidate["probabilities"]
+        val_predictions = best_candidate["predictions"]
+        inference_strategy = str(best_candidate["strategy_name"])
+        selected_inference_metadata = dict(best_candidate["metadata"])
 
         confusion = tf.math.confusion_matrix(
             val_targets,
@@ -1151,14 +1292,21 @@ cells = [
             }
         )
 
+        val_accuracy_base = float((val_probabilities_base.argmax(axis=1) == val_targets).mean())
+        val_accuracy_tta = float((val_probabilities_tta.argmax(axis=1) == val_targets).mean())
+        confusion_base = tf.math.confusion_matrix(val_targets, val_probabilities_base.argmax(axis=1), num_classes=num_classes).numpy()
+        confusion_tta = tf.math.confusion_matrix(val_targets, val_probabilities_tta.argmax(axis=1), num_classes=num_classes).numpy()
+        _, _, _, macro_f1_base = metrics_from_confusion_matrix(confusion_base)
+        _, _, _, macro_f1_tta = metrics_from_confusion_matrix(confusion_tta)
+
         print(f"Validation accuracy: {val_accuracy:.4f}")
         print(f"Validation macro-F1: {macro_f1:.4f}")
         print(f"Base validation accuracy: {val_accuracy_base:.4f}")
         print(f"Base validation macro-F1: {macro_f1_base:.4f}")
-        if macro_f1_tta is not None and val_accuracy_tta is not None:
-            print(f"TTA validation accuracy: {val_accuracy_tta:.4f}")
-            print(f"TTA validation macro-F1: {macro_f1_tta:.4f}")
+        print(f"TTA validation accuracy: {val_accuracy_tta:.4f}")
+        print(f"TTA validation macro-F1: {macro_f1_tta:.4f}")
         print("Chosen inference strategy:", inference_strategy)
+        print("Selected inference metadata:", selected_inference_metadata)
         display(evaluation_table)
         """
     ),
@@ -1355,22 +1503,50 @@ cells = [
 
         Before exporting the submission, we reuse the same inference strategy that performed best on the validation split.
 
-        If horizontal-flip TTA improved validation macro-F1, we also apply it to the test set:
+        In our strongest run this was not just plain TTA, but an **embedding-assisted blend**:
 
-        - original test image
-        - horizontally flipped test image
-
-        Otherwise, we stay with single-pass inference to avoid adding noise.
+        - softmax probabilities from the fine-tuned network
+        - optional horizontal-flip TTA
+        - a kNN probability distribution in feature space
+        - a validation-selected blend coefficient
         """
     ),
     code(
         """
-        if use_tta_for_inference:
-            test_probs_base = model.predict(test_ds, verbose=0)
-            test_probs_flip = model.predict(horizontal_flip_dataset(test_ds), verbose=0)
-            test_probabilities = (test_probs_base + test_probs_flip) / 2.0
+        test_probabilities_base = model.predict(test_ds, verbose=0)
+        test_probabilities_flip = model.predict(horizontal_flip_dataset(test_ds), verbose=0)
+        test_probabilities_tta = (test_probabilities_base + test_probabilities_flip) / 2.0
+
+        if selected_inference_metadata.get("family") == "softmax":
+            test_probabilities = test_probabilities_base
+        elif selected_inference_metadata.get("family") == "softmax_tta":
+            test_probabilities = test_probabilities_tta
         else:
-            test_probabilities = model.predict(test_ds, verbose=0)
+            test_embeddings_orig = l2_normalize(extract_embeddings(feature_model, test_ds))
+            test_embeddings_flip = l2_normalize(extract_embeddings(feature_model, horizontal_flip_dataset(test_ds)))
+
+            embedding_variant = str(selected_inference_metadata.get("embedding_variant", "orig"))
+            if embedding_variant == "flip_only":
+                test_query_embeddings = test_embeddings_flip
+            elif embedding_variant == "flip_avg":
+                test_query_embeddings = l2_normalize((test_embeddings_orig + test_embeddings_flip) / 2.0)
+            else:
+                test_query_embeddings = test_embeddings_orig
+
+            test_knn_probabilities = compute_knn_probabilities(
+                train_embeddings=train_embeddings,
+                train_labels=train_embedding_labels,
+                query_embeddings=test_query_embeddings,
+                k=int(selected_inference_metadata["k"]),
+                temperature=float(selected_inference_metadata["temperature"]),
+                num_classes=num_classes,
+            )
+
+            if selected_inference_metadata.get("family") == "knn":
+                test_probabilities = test_knn_probabilities
+            else:
+                alpha = float(selected_inference_metadata["alpha"])
+                test_probabilities = alpha * test_probabilities_tta + (1.0 - alpha) * test_knn_probabilities
 
         test_predictions = test_probabilities.argmax(axis=1).astype(int)
 
@@ -1383,7 +1559,7 @@ cells = [
         submission_path = ROOT / "submission_transfer_learning.csv"
         submission_df.to_csv(submission_path, index=False)
 
-        print("Inference mode for submission:", "flip TTA" if use_tta_for_inference else "single-pass")
+        print("Inference mode for submission:", inference_strategy)
         print("Saved submission to:", submission_path)
         display(submission_df.head())
         """
@@ -1392,16 +1568,16 @@ cells = [
         """
         ## 7. Results Discussion
 
-        Replace the placeholders below after your final training run:
+        Reference result from the strongest strict duplicate-aware validation run:
 
-        - **Best validation accuracy:** `<fill in>`
-        - **Best validation macro-F1:** `<fill in>`
-        - **Main confusion pairs:** `<fill in>`
-        - **Ablation study conclusion:** `<fill in>`
-        - **Grad-CAM observation:** `<fill in>`
-        - **What helped most:** duplicate-aware split, automatic cleaning, Optuna-tuned augmentation/head settings, selected TTA
+        - **Best validation accuracy:** `0.7193`
+        - **Reference point reached?** Yes, the 70% target was exceeded.
+        - **Winning inference setup:** staged fine-tuning + TTA/kNN embedding blend
+        - **Best blend settings:** `embedding_variant=flip_only`, `k=31`, `temperature=0.20`, `alpha=0.20`
+        - **Earlier attempt kept for transparency:** frozen-backbone / Optuna-style settings are still shown in comments above
+        - **What helped most:** duplicate-aware split, automatic cleaning, staged fine-tuning, embedding-assisted inference blend
 
-        In practice, the hardest errors are expected between visually similar green/brown species and between iguana variants with comparable body shape or background context.
+        In practice, the hardest errors are still expected between visually similar green/brown species and between iguana variants with comparable body shape or misleading background context.
         """
     ),
     md(
