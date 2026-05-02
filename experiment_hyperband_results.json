@@ -1,0 +1,179 @@
+{
+  "note": "Optuna HyperbandPruner tuning on the duplicate-aware validation split. No validation images are used for training.",
+  "best_value": 0.6835474958439701,
+  "best_trial": {
+    "number": 0,
+    "params": {
+      "backbone": "efficientnetv2b0",
+      "dropout": 0.5,
+      "dense_units": 0,
+      "augmentation_strength": 0.6,
+      "head_lr": 0.00047208048834382316,
+      "fine_lr": 2.2268043023619695e-05,
+      "fine_layers": 60,
+      "optimizer": "adam",
+      "weight_decay": 2.8465263577610947e-06
+    },
+    "user_attrs": {
+      "model_path": "tmp_hyperband_trial_0.keras",
+      "val_accuracy": 0.6228070175438597,
+      "val_macro_f1": 0.6229916387927614,
+      "val_accuracy_tta": 0.618421052631579,
+      "val_macro_f1_tta": 0.6187979384436978,
+      "blend_result": {
+        "family": "blend_tta_knn",
+        "k": 15,
+        "temperature": 0.2,
+        "alpha": 0.2,
+        "val_accuracy": 0.6842105263157895,
+        "val_macro_f1": 0.6828844653721508
+      }
+    }
+  },
+  "trials": [
+    {
+      "number": 0,
+      "state": "COMPLETE",
+      "value": 0.6835474958439701,
+      "params": {
+        "backbone": "efficientnetv2b0",
+        "dropout": 0.5,
+        "dense_units": 0,
+        "augmentation_strength": 0.6,
+        "head_lr": 0.00047208048834382316,
+        "fine_lr": 2.2268043023619695e-05,
+        "fine_layers": 60,
+        "optimizer": "adam",
+        "weight_decay": 2.8465263577610947e-06
+      },
+      "user_attrs": {
+        "model_path": "tmp_hyperband_trial_0.keras",
+        "val_accuracy": 0.6228070175438597,
+        "val_macro_f1": 0.6229916387927614,
+        "val_accuracy_tta": 0.618421052631579,
+        "val_macro_f1_tta": 0.6187979384436978,
+        "blend_result": {
+          "family": "blend_tta_knn",
+          "k": 15,
+          "temperature": 0.2,
+          "alpha": 0.2,
+          "val_accuracy": 0.6842105263157895,
+          "val_macro_f1": 0.6828844653721508
+        }
+      }
+    },
+    {
+      "number": 4,
+      "state": "COMPLETE",
+      "value": 0.6334954422542338,
+      "params": {
+        "backbone": "efficientnetv2b0",
+        "dropout": 0.25,
+        "dense_units": 128,
+        "augmentation_strength": 1.2000000000000002,
+        "head_lr": 0.00014276799356162826,
+        "fine_lr": 5.0690826177963146e-06,
+        "fine_layers": 25,
+        "optimizer": "adamw",
+        "weight_decay": 1.936518766909302e-06
+      },
+      "user_attrs": {
+        "model_path": "tmp_hyperband_trial_4.keras",
+        "val_accuracy": 0.5921052631578947,
+        "val_macro_f1": 0.5939298796441653,
+        "val_accuracy_tta": 0.5833333333333334,
+        "val_macro_f1_tta": 0.5821053458150232,
+        "blend_result": {
+          "family": "blend_tta_knn",
+          "k": 41,
+          "temperature": 0.1,
+          "alpha": 0.2,
+          "val_accuracy": 0.6359649122807017,
+          "val_macro_f1": 0.631025972227766
+        }
+      }
+    },
+    {
+      "number": 1,
+      "state": "COMPLETE",
+      "value": 0.6176609273209637,
+      "params": {
+        "backbone": "efficientnetv2b0",
+        "dropout": 0.4,
+        "dense_units": 64,
+        "augmentation_strength": 0.8,
+        "head_lr": 0.00019279018782806834,
+        "fine_lr": 1.5529310666912354e-05,
+        "fine_layers": 25,
+        "optimizer": "adamw",
+        "weight_decay": 2.644898018392711e-06
+      },
+      "user_attrs": {
+        "model_path": "tmp_hyperband_trial_1.keras",
+        "val_accuracy": 0.5175438596491229,
+        "val_macro_f1": 0.519388796281697,
+        "val_accuracy_tta": 0.5350877192982456,
+        "val_macro_f1_tta": 0.5383147455595896,
+        "blend_result": {
+          "family": "blend_tta_knn",
+          "k": 7,
+          "temperature": 0.07,
+          "alpha": 0.5,
+          "val_accuracy": 0.618421052631579,
+          "val_macro_f1": 0.6169008020103485
+        }
+      }
+    },
+    {
+      "number": 5,
+      "state": "PRUNED",
+      "value": 0.5448535920809368,
+      "params": {
+        "backbone": "efficientnetb0",
+        "dropout": 0.35,
+        "dense_units": 128,
+        "augmentation_strength": 1.1,
+        "head_lr": 0.00031341237720768165,
+        "fine_lr": 4.533497257870932e-05,
+        "fine_layers": 90,
+        "optimizer": "adamw",
+        "weight_decay": 1.671827894765161e-05
+      },
+      "user_attrs": {}
+    },
+    {
+      "number": 3,
+      "state": "PRUNED",
+      "value": 0.5345034599789025,
+      "params": {
+        "backbone": "efficientnetb0",
+        "dropout": 0.55,
+        "dense_units": 64,
+        "augmentation_strength": 1.0,
+        "head_lr": 0.0005216240282742544,
+        "fine_lr": 6.229733277230494e-06,
+        "fine_layers": 90,
+        "optimizer": "adamw",
+        "weight_decay": 7.651053666754206e-06
+      },
+      "user_attrs": {}
+    },
+    {
+      "number": 2,
+      "state": "PRUNED",
+      "value": 0.40287815930128024,
+      "params": {
+        "backbone": "efficientnetv2b0",
+        "dropout": 0.55,
+        "dense_units": 0,
+        "augmentation_strength": 1.1,
+        "head_lr": 0.00022004181237640915,
+        "fine_lr": 6.771289447645429e-06,
+        "fine_layers": 60,
+        "optimizer": "adam",
+        "weight_decay": 1.9420998251718043e-05
+      },
+      "user_attrs": {}
+    }
+  ]
+}
