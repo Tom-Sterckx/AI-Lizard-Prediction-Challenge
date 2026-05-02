@@ -1,0 +1,1386 @@
+{
+  "note": "Only models trained through group-split experiments; excludes tmp_b0_stratified_baseline because that model used a different split.",
+  "singles": [
+    {
+      "member": "tmp_stage_baseline.keras:base",
+      "acc": 0.6491228070175439,
+      "f1": 0.6379053369736599
+    },
+    {
+      "member": "tmp_stage_baseline.keras:flip",
+      "acc": 0.6578947368421053,
+      "f1": 0.6499440874376505
+    },
+    {
+      "member": "tmp_stage_baseline.keras:tta",
+      "acc": 0.6535087719298246,
+      "f1": 0.6453153877243968
+    },
+    {
+      "member": "tmp_ev2b0_baseline.keras:base",
+      "acc": 0.6228070175438597,
+      "f1": 0.621681602400341
+    },
+    {
+      "member": "tmp_ev2b0_baseline.keras:flip",
+      "acc": 0.6052631578947368,
+      "f1": 0.604706717599032
+    },
+    {
+      "member": "tmp_ev2b0_baseline.keras:tta",
+      "acc": 0.5964912280701754,
+      "f1": 0.5928447142732857
+    },
+    {
+      "member": "best_lizard_model.keras:base",
+      "acc": 0.6535087719298246,
+      "f1": 0.6468793857959724
+    },
+    {
+      "member": "best_lizard_model.keras:flip",
+      "acc": 0.6622807017543859,
+      "f1": 0.6573876634211182
+    },
+    {
+      "member": "best_lizard_model.keras:tta",
+      "acc": 0.6578947368421053,
+      "f1": 0.6518924633381883
+    },
+    {
+      "member": "tmp_color_ablation_rgb_b0.keras:base",
+      "acc": 0.6491228070175439,
+      "f1": 0.6379053369736599
+    },
+    {
+      "member": "tmp_color_ablation_rgb_b0.keras:flip",
+      "acc": 0.6578947368421053,
+      "f1": 0.6499440874376505
+    },
+    {
+      "member": "tmp_color_ablation_rgb_b0.keras:tta",
+      "acc": 0.6535087719298246,
+      "f1": 0.6453153877243968
+    },
+    {
+      "member": "tmp_hyperband_trial_0.keras:base",
+      "acc": 0.6228070175438597,
+      "f1": 0.6229916387927614
+    },
+    {
+      "member": "tmp_hyperband_trial_0.keras:flip",
+      "acc": 0.5964912280701754,
+      "f1": 0.5955001189681515
+    },
+    {
+      "member": "tmp_hyperband_trial_0.keras:tta",
+      "acc": 0.618421052631579,
+      "f1": 0.6187979384436978
+    },
+    {
+      "member": "tmp_hyperband_trial_1.keras:base",
+      "acc": 0.5175438596491229,
+      "f1": 0.519388796281697
+    },
+    {
+      "member": "tmp_hyperband_trial_1.keras:flip",
+      "acc": 0.5087719298245614,
+      "f1": 0.5124311675833925
+    },
+    {
+      "member": "tmp_hyperband_trial_1.keras:tta",
+      "acc": 0.5350877192982456,
+      "f1": 0.5383147455595896
+    },
+    {
+      "member": "tmp_hyperband_trial_4.keras:base",
+      "acc": 0.5921052631578947,
+      "f1": 0.5939298796441653
+    },
+    {
+      "member": "tmp_hyperband_trial_4.keras:flip",
+      "acc": 0.5570175438596491,
+      "f1": 0.5536704555239818
+    },
+    {
+      "member": "tmp_hyperband_trial_4.keras:tta",
+      "acc": 0.5833333333333334,
+      "f1": 0.5821053458150232
+    }
+  ],
+  "top_results": [
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base"
+      ],
+      "temp": 0.6,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base"
+      ],
+      "temp": 0.8,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base"
+      ],
+      "temp": 1.0,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base"
+      ],
+      "temp": 1.2,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base"
+      ],
+      "temp": 1.5,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base"
+      ],
+      "temp": 2.0,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7149122807017544,
+      "f1": 0.7097407866067817
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:flip",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:flip",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:flip",
+        "tmp_hyperband_trial_0.keras:base",
+        "tmp_hyperband_trial_1.keras:flip"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7060025045799865
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "equal",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "best_lizard_model.keras:tta",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7054371206959731
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.59,
+        0.41000000000000003
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.6,
+        0.4
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.61,
+        0.39
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.61,
+        0.39
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.61,
+        0.39
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.61,
+        0.39
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.61,
+        0.39
+      ],
+      "temp": 1.5,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_stage_baseline.keras:tta",
+        "tmp_ev2b0_baseline.keras:base"
+      ],
+      "weights": [
+        0.61,
+        0.39
+      ],
+      "temp": 2.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "weights": [
+        0.39,
+        0.61
+      ],
+      "temp": 0.6,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "weights": [
+        0.39,
+        0.61
+      ],
+      "temp": 0.8,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "weights": [
+        0.39,
+        0.61
+      ],
+      "temp": 1.0,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    },
+    {
+      "kind": "pair_weighted",
+      "members": [
+        "tmp_ev2b0_baseline.keras:base",
+        "tmp_color_ablation_rgb_b0.keras:tta"
+      ],
+      "weights": [
+        0.39,
+        0.61
+      ],
+      "temp": 1.2,
+      "acc": 0.7105263157894737,
+      "f1": 0.7043353586488191
+    }
+  ]
+}

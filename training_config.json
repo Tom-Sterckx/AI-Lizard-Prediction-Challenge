@@ -1,0 +1,13 @@
+{
+  "learning_rate_schedule": "exponential_decay",
+  "head_learning_rate": 0.0003,
+  "finetune_learning_rate": 3e-05,
+  "use_tensorboard": true,
+  "use_wandb": false,
+  "initial_epochs": 8,
+  "finetune_epochs": 12,
+  "batch_size": 24,
+  "augmentation_strength": 1.0,
+  "dropout_rate": 0.35,
+  "timestamp": "2026-05-02T14:52:53.677557"
+}
