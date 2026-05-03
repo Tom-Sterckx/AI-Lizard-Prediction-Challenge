@@ -1086,6 +1086,35 @@ cells = [
 
         plt.tight_layout()
         plt.show()
+
+        def summarize_learning_curve(history_frame: pd.DataFrame) -> dict[str, float | int | bool]:
+            train_loss = history_frame["loss"].dropna().astype(float)
+            val_loss = history_frame["val_loss"].dropna().astype(float)
+            train_steps_down = int((train_loss.diff().dropna() <= 0).sum()) if len(train_loss) > 1 else 0
+            val_steps_down = int((val_loss.diff().dropna() <= 0).sum()) if len(val_loss) > 1 else 0
+            return {
+                "epochs_ran": int(history_frame["epoch"].max()),
+                "train_loss_start": round(float(train_loss.iloc[0]), 5),
+                "train_loss_final": round(float(train_loss.iloc[-1]), 5),
+                "train_loss_min": round(float(train_loss.min()), 5),
+                "train_loss_delta": round(float(train_loss.iloc[0] - train_loss.iloc[-1]), 5),
+                "train_loss_down_ratio": round(train_steps_down / max(len(train_loss) - 1, 1), 3),
+                "val_loss_start": round(float(val_loss.iloc[0]), 5),
+                "val_loss_final": round(float(val_loss.iloc[-1]), 5),
+                "val_loss_min": round(float(val_loss.min()), 5),
+                "val_loss_delta": round(float(val_loss.iloc[0] - val_loss.iloc[-1]), 5),
+                "val_loss_down_ratio": round(val_steps_down / max(len(val_loss) - 1, 1), 3),
+                "best_val_loss_epoch": int(history_frame.loc[history_frame["val_loss"].idxmin(), "epoch"]),
+                "loss_improved": bool(train_loss.iloc[-1] < train_loss.iloc[0] and val_loss.min() < val_loss.iloc[0]),
+            }
+
+        learning_curve_summary = summarize_learning_curve(history_df)
+        display(pd.DataFrame([learning_curve_summary]))
+
+        history_output_path = ROOT / "artifacts" / "reports" / "latest_training_history.csv"
+        history_output_path.parent.mkdir(parents=True, exist_ok=True)
+        history_df.to_csv(history_output_path, index=False)
+        print(f"Saved latest training history to: {history_output_path}")
         """
     ),
     md(
