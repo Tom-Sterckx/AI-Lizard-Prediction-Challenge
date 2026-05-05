@@ -1,0 +1,20 @@
+{
+  "model_path": "/kaggle/working/artifacts/best_lizard_model_convnext_tiny.keras",
+  "backbone_name": "convnext_tiny",
+  "img_size": [
+    384,
+    384
+  ],
+  "class_names": [
+    "Black_spiny_tailed_iguana",
+    "Brown_anole",
+    "Cuban_knight_anole",
+    "Desert_iguana",
+    "Green_anole",
+    "Green_iguana",
+    "Lesser_Antillean_iguana"
+  ],
+  "num_classes": 7,
+  "tensorflow_version": "2.19.0",
+  "keras_format": "native .keras full model"
+}
