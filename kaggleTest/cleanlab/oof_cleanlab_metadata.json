@@ -1,0 +1,46 @@
+{
+  "n_folds": 3,
+  "active_oof_backbones": [
+    "efficientnetv2s",
+    "efficientnetb0"
+  ],
+  "oof_weights": {
+    "efficientnetv2s": 0.550102,
+    "efficientnetb0": 0.449898
+  },
+  "use_tta": true,
+  "num_samples": 1334,
+  "model_paths": [
+    {
+      "fold": 1,
+      "backbone": "efficientnetv2s",
+      "path": "/kaggle/working/oof_cleanlab_3fold/oof_fold_1_efficientnetv2s.keras"
+    },
+    {
+      "fold": 1,
+      "backbone": "efficientnetb0",
+      "path": "/kaggle/working/oof_cleanlab_3fold/oof_fold_1_efficientnetb0.keras"
+    },
+    {
+      "fold": 2,
+      "backbone": "efficientnetv2s",
+      "path": "/kaggle/working/oof_cleanlab_3fold/oof_fold_2_efficientnetv2s.keras"
+    },
+    {
+      "fold": 2,
+      "backbone": "efficientnetb0",
+      "path": "/kaggle/working/oof_cleanlab_3fold/oof_fold_2_efficientnetb0.keras"
+    },
+    {
+      "fold": 3,
+      "backbone": "efficientnetv2s",
+      "path": "/kaggle/working/oof_cleanlab_3fold/oof_fold_3_efficientnetv2s.keras"
+    },
+    {
+      "fold": 3,
+      "backbone": "efficientnetb0",
+      "path": "/kaggle/working/oof_cleanlab_3fold/oof_fold_3_efficientnetb0.keras"
+    }
+  ],
+  "metric_comparison_csv": "/kaggle/working/oof_cleanlab_3fold/oof_cleanlab_metric_comparison.csv"
+}
