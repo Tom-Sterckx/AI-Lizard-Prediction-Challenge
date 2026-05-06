@@ -1,0 +1,52 @@
+{
+  "backbones": [
+    "convnext_tiny",
+    "efficientnetv2s",
+    "efficientnetb0"
+  ],
+  "num_validation_samples": 201,
+  "probability_shapes": {
+    "convnext_tiny": [
+      201,
+      7
+    ],
+    "efficientnetv2s": [
+      201,
+      7
+    ],
+    "efficientnetb0": [
+      201,
+      7
+    ]
+  },
+  "selected_ensemble_weights": {
+    "convnext_tiny": 0.048018467060710085,
+    "efficientnetv2s": 0.5334939083257236,
+    "efficientnetb0": 0.4184876246135662
+  },
+  "selected_ensemble_strategy": "optuna",
+  "ensemble_backbones": [
+    "convnext_tiny",
+    "efficientnetv2s",
+    "efficientnetb0"
+  ],
+  "id_to_class": {
+    "0": "Black_spiny_tailed_iguana",
+    "1": "Brown_anole",
+    "2": "Cuban_knight_anole",
+    "3": "Desert_iguana",
+    "4": "Green_anole",
+    "5": "Green_iguana",
+    "6": "Lesser_Antillean_iguana"
+  },
+  "class_names": [
+    "Black_spiny_tailed_iguana",
+    "Brown_anole",
+    "Cuban_knight_anole",
+    "Desert_iguana",
+    "Green_anole",
+    "Green_iguana",
+    "Lesser_Antillean_iguana"
+  ],
+  "notes": "Use val_probabilities_by_backbone.npz + final_val_labels.npy for local ensemble weight tests. No model inference is needed."
+}
