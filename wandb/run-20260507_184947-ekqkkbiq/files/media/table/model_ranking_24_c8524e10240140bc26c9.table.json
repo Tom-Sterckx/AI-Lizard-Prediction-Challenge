@@ -1,0 +1,1 @@
+{"columns": ["model", "accuracy"], "data": [["efficientnetv2s", 0.17484662576687116], ["efficientnetb0", 0.16257668711656442], ["convnext_tiny", 0.13803680981595093]]}

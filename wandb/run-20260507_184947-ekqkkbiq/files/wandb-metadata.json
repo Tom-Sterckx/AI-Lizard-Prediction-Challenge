@@ -1,0 +1,28 @@
+{
+  "os":  "Windows-11-10.0.26200-SP0",
+  "python":  "CPython 3.13.7",
+  "startedAt":  "2026-05-07T16:49:47.371911Z",
+  "program":  "c:\\Users\\ameli\\Documents\\Hogeschool\\2APPAI\\Artificial Intelligence\\AI-Lizard-Prediction-Challenge\\AH_wandb_test.ipynb",
+  "codePath":  "c:\\Users\\ameli\\Documents\\Hogeschool\\2APPAI\\Artificial Intelligence\\AI-Lizard-Prediction-Challenge\\AH_wandb_test.ipynb",
+  "codePathLocal":  "AH_wandb_test.ipynb",
+  "git":  {
+    "remote":  "https://github.com/Tom-Sterckx/AI-Lizard-Prediction-Challenge.git",
+    "commit":  "4fdb8a3d2abe022fab0c4b8f2c5db90ac979d50f"
+  },
+  "email":  "amelie.hermans6@gmail.com",
+  "root":  "c:\\Users\\ameli\\Documents\\Hogeschool\\2APPAI\\Artificial Intelligence\\AI-Lizard-Prediction-Challenge",
+  "host":  "DESKTOP-PLFB227",
+  "executable":  "c:\\Users\\ameli\\Documents\\Hogeschool\\2APPAI\\Artificial Intelligence\\AI-Lizard-Prediction-Challenge\\lizard_env\\Scripts\\python.exe",
+  "cpu_count":  10,
+  "cpu_count_logical":  12,
+  "disk":  {
+    "/":  {
+      "total":  "510675382272",
+      "used":  "399919357952"
+    }
+  },
+  "memory":  {
+    "total":  "33974161408"
+  },
+  "writerId":  "596tldenaz4647whwjau9gj1ui4nklno"
+}

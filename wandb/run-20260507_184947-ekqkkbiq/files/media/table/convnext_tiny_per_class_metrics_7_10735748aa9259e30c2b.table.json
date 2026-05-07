@@ -1,0 +1,1 @@
+{"columns": ["class", "precision", "recall", "f1"], "data": [["Black_spiny_tailed_iguana", 0.0, 0.0, 0.0], ["Brown_anole", 0.0, 0.0, 0.0], ["Cuban_knight_anole", 0.0, 0.0, 0.0], ["Desert_iguana", 0.0, 0.0, 0.0], ["Green_anole", 0.13803680981595093, 1.0, 0.24258760107816713], ["Green_iguana", 0.0, 0.0, 0.0], ["Lesser_Antillean_iguana", 0.0, 0.0, 0.0]]}
