@@ -7,6 +7,7 @@ import io
 import json
 import os
 import sys
+import socket
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -17,10 +18,47 @@ from PIL import Image, ImageOps
 from typing import Any
 
 
+# Register custom layers from the notebook so the ensemble model can be loaded
+@tf.keras.utils.register_keras_serializable(package="Lizard")
+class HorizontalFlip(tf.keras.layers.Layer):
+    def call(self, inputs):
+        return tf.image.flip_left_right(inputs)
+
+
+@tf.keras.utils.register_keras_serializable(package="Lizard")
+class WeightedProbabilityEnsemble(tf.keras.layers.Layer):
+    def __init__(self, weights, **kwargs):
+        super().__init__(**kwargs)
+        self.ensemble_weights = [float(weight) for weight in weights]
+
+    def call(self, inputs):
+        if len(inputs) != len(self.ensemble_weights):
+            raise ValueError(
+                f"Expected {len(self.ensemble_weights)} inputs, got {len(inputs)}"
+            )
+        weighted_sum = tf.cast(inputs[0], dtype=tf.float32) * self.ensemble_weights[0]
+        for i, weight in enumerate(self.ensemble_weights[1:], 1):
+            weighted_sum += tf.cast(inputs[i], dtype=tf.float32) * weight
+        return weighted_sum
+
+    def get_config(self):
+        config = super().get_config()
+        config["weights"] = self.ensemble_weights
+        return config
+
+
+@tf.keras.utils.register_keras_serializable(package="Lizard")
+class AverageProbabilities(tf.keras.layers.Layer):
+    def call(self, inputs):
+        if len(inputs) != 2:
+            raise ValueError("AverageProbabilities expects exactly two tensors.")
+        return (tf.cast(inputs[0], tf.float32) + tf.cast(inputs[1], tf.float32)) / 2.0
+
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 TRAIN_DIR = PROJECT_ROOT / "train"
-IMG_SIZE = (384, 384)
+IMG_SIZE = (448, 448)
 MODEL_PATTERNS = ("best_lizard_model_*.keras", "*.keras")
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 MODEL_CACHE: dict[Path, tuple[float, tf.keras.Model]] = {}
@@ -97,12 +135,20 @@ def unwrap_single_output(value: Any) -> Any:
 
 
 def load_cached_model(model_path: Path) -> tf.keras.Model:
+    """Load model without strict custom object checking."""
     model_path = model_path.resolve()
     modified_time = model_path.stat().st_mtime
     cached = MODEL_CACHE.get(model_path)
     if cached is not None and cached[0] == modified_time:
         return cached[1]
-    model = tf.keras.models.load_model(model_path, compile=False)
+    
+    # Load with safe_mode=False to handle models with custom layers from the notebook
+    model = tf.keras.models.load_model(
+        str(model_path),
+        compile=False,
+        safe_mode=False
+    )
+    
     MODEL_CACHE[model_path] = (modified_time, model)
     return model
 
@@ -169,10 +215,41 @@ def model_slices(model: tf.keras.Model, backbone: tf.keras.Model) -> tuple[list[
     return pre_layers, post_layers
 
 
-def predict_with_gradcam(
+def heatmap_to_color_image(heatmap_array: np.ndarray) -> Image.Image:
+    heatmap_array = np.asarray(heatmap_array, dtype=np.float32)
+    heatmap_array = np.clip(heatmap_array, 0.0, 1.0)
+    red = np.clip(1.5 - np.abs(4.0 * heatmap_array - 3.0), 0.0, 1.0)
+    green = np.clip(1.5 - np.abs(4.0 * heatmap_array - 2.0), 0.0, 1.0)
+    blue = np.clip(1.5 - np.abs(4.0 * heatmap_array - 1.0), 0.0, 1.0)
+    color_heatmap = np.stack([red, green, blue], axis=-1)
+    return Image.fromarray(np.uint8(255 * color_heatmap))
+
+
+def is_ensemble_model(model: tf.keras.Model) -> bool:
+    branch_models = [
+        layer for layer in model.layers
+        if isinstance(layer, tf.keras.Model) and layer.name.startswith("lizard_")
+    ]
+    return len(branch_models) >= 2 and any("probability_average" in layer.name for layer in model.layers)
+
+
+def branch_weights(model: tf.keras.Model, branch_count: int) -> list[float]:
+    for layer in model.layers:
+        if hasattr(layer, "ensemble_weights"):
+            weights = [float(value) for value in getattr(layer, "ensemble_weights")]
+            if len(weights) >= branch_count:
+                weights = weights[:branch_count]
+                total = sum(weights)
+                if total > 0:
+                    return [weight / total for weight in weights]
+    return [1.0 / branch_count] * branch_count
+
+
+def gradcam_for_model(
     model: tf.keras.Model,
     image_batch: np.ndarray,
     original_size: tuple[int, int],
+    target_class_index: int | None = None,
 ) -> tuple[np.ndarray, int, Image.Image]:
     backbone = find_backbone(model)
     target_layer = find_last_spatial_layer(backbone)
@@ -195,7 +272,10 @@ def predict_with_gradcam(
         for layer in post_layers:
             predictions = call_layer(layer, predictions)
         predictions = unwrap_single_output(predictions)
-        class_index = int(tf.argmax(predictions[0]).numpy())
+        if target_class_index is None:
+            class_index = int(tf.argmax(predictions[0]).numpy())
+        else:
+            class_index = int(target_class_index)
         score = predictions[:, class_index]
 
     gradients = tape.gradient(score, conv_outputs)
@@ -211,14 +291,54 @@ def predict_with_gradcam(
     heatmap_img = Image.fromarray(np.uint8(255 * heatmap_np), mode="L")
     heatmap_img = heatmap_img.resize(original_size, Image.Resampling.BICUBIC)
     heatmap_arr = np.asarray(heatmap_img, dtype=np.float32) / 255.0
+    return predictions.numpy()[0], class_index, heatmap_to_color_image(heatmap_arr)
 
-    # Lightweight jet-like color map without an extra matplotlib dependency.
-    red = np.clip(1.5 - np.abs(4.0 * heatmap_arr - 3.0), 0.0, 1.0)
-    green = np.clip(1.5 - np.abs(4.0 * heatmap_arr - 2.0), 0.0, 1.0)
-    blue = np.clip(1.5 - np.abs(4.0 * heatmap_arr - 1.0), 0.0, 1.0)
-    color_heatmap = np.stack([red, green, blue], axis=-1)
 
-    return predictions.numpy()[0], class_index, Image.fromarray(np.uint8(255 * color_heatmap))
+def ensemble_gradcam_for_model(
+    model: tf.keras.Model,
+    image_batch: np.ndarray,
+    original_size: tuple[int, int],
+) -> tuple[np.ndarray, int, Image.Image]:
+    predictions = unwrap_single_output(model(tf.convert_to_tensor(image_batch, dtype=tf.float32), training=False))
+    probabilities = predictions.numpy()[0]
+    class_index = int(np.argmax(probabilities))
+
+    branches = [
+        layer for layer in model.layers
+        if isinstance(layer, tf.keras.Model) and layer.name.startswith("lizard_")
+    ]
+    if not branches:
+        return gradcam_for_model(model, image_batch, original_size, target_class_index=class_index)
+
+    weights = branch_weights(model, len(branches))
+    flipped_batch = image_batch[:, :, ::-1, :]
+    combined_heatmap = np.zeros((original_size[1], original_size[0]), dtype=np.float32)
+
+    for branch_model, weight in zip(branches, weights):
+        _, _, original_heatmap = gradcam_for_model(branch_model, image_batch, original_size, target_class_index=class_index)
+        _, _, flipped_heatmap = gradcam_for_model(branch_model, flipped_batch, original_size, target_class_index=class_index)
+        original_gray = np.asarray(original_heatmap.convert("L"), dtype=np.float32) / 255.0
+        flipped_gray = np.asarray(ImageOps.mirror(flipped_heatmap.convert("L")), dtype=np.float32) / 255.0
+        combined_heatmap += weight * ((original_gray + flipped_gray) / 2.0)
+
+    combined_min = float(np.min(combined_heatmap))
+    combined_max = float(np.max(combined_heatmap))
+    if combined_max > combined_min:
+        combined_heatmap = (combined_heatmap - combined_min) / (combined_max - combined_min)
+    else:
+        combined_heatmap = np.zeros_like(combined_heatmap)
+
+    return probabilities, class_index, heatmap_to_color_image(combined_heatmap)
+
+
+def predict_with_gradcam(
+    model: tf.keras.Model,
+    image_batch: np.ndarray,
+    original_size: tuple[int, int],
+) -> tuple[np.ndarray, int, Image.Image]:
+    if is_ensemble_model(model):
+        return ensemble_gradcam_for_model(model, image_batch, original_size)
+    return gradcam_for_model(model, image_batch, original_size)
 
 
 def predict_without_gradcam(model: tf.keras.Model, image_batch: np.ndarray) -> tuple[np.ndarray, int, Image.Image]:
@@ -384,9 +504,18 @@ class LizardHandler(BaseHTTPRequestHandler):
 
             image_item = form["image"]
             image_bytes = image_item.file.read()
-            original, image_batch = load_uploaded_image(image_bytes, image_size_for_model(model_path))
-
+            
             model = load_cached_model(model_path)
+            
+            # Get the actual input shape from the model
+            model_input_shape = model.input_shape
+            if model_input_shape and len(model_input_shape) >= 3:
+                img_h, img_w = model_input_shape[1], model_input_shape[2]
+            else:
+                img_h, img_w = image_size_for_model(model_path)
+            
+            original, image_batch = load_uploaded_image(image_bytes, (img_h, img_w))
+            
             warning = ""
             try:
                 probabilities, predicted_index, heatmap = predict_with_gradcam(model, image_batch, original.size)
@@ -424,11 +553,35 @@ class LizardHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    port = int(os.environ.get("PORT", "8000"))
-    server = ThreadingHTTPServer(("127.0.0.1", port), LizardHandler)
-    print(f"Lizard Grad-CAM app running at http://127.0.0.1:{port}")
-    print("Press Ctrl+C to stop.")
-    server.serve_forever()
+    base_port = int(os.environ.get("PORT", "8888"))
+    
+    class ReuseAddrHTTPServer(ThreadingHTTPServer):
+        def server_bind(self):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
+                self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 0)
+            super().server_bind()
+    
+    # Try to bind to a port, with fallback ports
+    port = base_port
+    max_attempts = 5
+    server = None
+    
+    for attempt in range(max_attempts):
+        try:
+            server = ReuseAddrHTTPServer(("127.0.0.1", port), LizardHandler)
+            print(f"Lizard Grad-CAM app running at http://127.0.0.1:{port}")
+            break
+        except OSError as e:
+            print(f"Port {port} in use or blocked, trying {port + 1}...")
+            port += 1
+            if attempt == max_attempts - 1:
+                print(f"Could not find an available port after {max_attempts} attempts")
+                raise
+    
+    if server:
+        print("Press Ctrl+C to stop.")
+        server.serve_forever()
 
 
 if __name__ == "__main__":
